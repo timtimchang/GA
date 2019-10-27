@@ -1,0 +1,20 @@
+complete: 100000 and the prob is 0.16569
+complete: 200000 and the prob is 0.16466
+complete: 300000 and the prob is 0.16382333333333332
+complete: 400000 and the prob is 0.16444
+complete: 500000 and the prob is 0.163968
+complete: 600000 and the prob is 0.164345
+complete: 700000 and the prob is 0.16412
+complete: 800000 and the prob is 0.1643
+complete: 900000 and the prob is 0.16407
+3 deception prob:0.16426200
+complete: 100000 and the prob is 0.11746
+complete: 200000 and the prob is 0.1182
+complete: 300000 and the prob is 0.11773666666666667
+complete: 400000 and the prob is 0.1178475
+complete: 500000 and the prob is 0.117894
+complete: 600000 and the prob is 0.11757833333333334
+complete: 700000 and the prob is 0.11755857142857143
+complete: 800000 and the prob is 0.1174475
+complete: 900000 and the prob is 0.11735888888888889
+4 deception prob:0.11770200
