@@ -10,11 +10,20 @@ class GA:
         self.min = 0
 
         # for fit
-        self.fit = list(range( self.max))
-        random.shuffle(self.fit)
+        self.fit = self.uniform_fit()
+        #self.fit = list(range( self.max))
+        #random.shuffle(self.fit)
         self.best_fit = max(self.fit)
         self.arg_best_fit = int( max(range(len(self.fit)), key= self.fit.__getitem__ ))
         
+    def uniform_fit(self):
+        fit_list = []
+        for i in range( self.max ):
+            fit = random.uniform(0,1)
+            fit_list.append(fit)
+        
+        return fit_list
+
     def f(self, x):
         if x < self.min or x > self.max :
             return nan
@@ -62,9 +71,9 @@ class GA:
 
         return ps 
 
-    def deception(self, dcpt = 3, display = False):
+    def deception(self, display = False):
         #print("  abf",self.arg_best_fit)
-        best_x = self.d2b(self.arg_best_fit) 
+        best_x = self.d2b( self.arg_best_fit ) 
 
         s = list(range(self.length))
         idx = self.powerset(s)[1:-1:] # except the [] and [all] 
@@ -91,11 +100,14 @@ class GA:
                 x_score = self.f( self.b2d( x_list[j] ))
                 x_sum += x_score
                 for k in range(len(cx_list)):
-                    cx_score = self.f( self.b2d( cx_list[k]  ))
+                    cx_score = self.f( self.b2d( cx_list[k][j]  ))
                     cx_sum[k] += cx_score
+            #print("cx_sum",cx_sum)
             cx_sum_max = max(cx_sum)
 
-            if cx_sum_max > x_sum : 
+            if cx_sum_max < x_sum : 
+                return False
+            else:
                 if display :
                     print("  x pow", x_pow)
                     print("  cx pow", cx_pow)
@@ -103,8 +115,6 @@ class GA:
                     print("  cx list", cx_list)
                     print("  x:",x_sum,"cd", cx_sum_max)
                     print()
-            else:
-                return False
 
         return True
 
@@ -135,33 +145,33 @@ class GA:
         #print(set)
         return set
 
-    def deception_test(self, dcpt = 3, iter = 10e6, display = True): 
+    def deception_test(self, iter = 10e6, display = True): 
         count = 0
         
         for i in range(0,int(iter)):
             if display : self.printf()
-            if self.deception(dcpt, display) == True : count += 1
+            if self.deception(display) == True : count += 1
             self.refit()
 
-            if i % 1e5 == 0 and i != 0: print("complete:",i,"and the prob is", count / i)
+            if i % 1e5 == 0 and i != 0: print "complete: {} and the prob is {:.4f}".format(i , count / i)
             
                 
         return count / iter
     
     def refit(self):
-        self.fit = list(range( self.max))
-        random.shuffle(self.fit)
+        self.fit = self.uniform_fit()
         self.best_fit = max(self.fit)
         self.arg_best_fit = int( max(range(len(self.fit)), key= self.fit.__getitem__ ))
 
 
 if __name__ == "__main__" :
     GA_thr = GA(3)
-    prob = GA_thr.deception_test(iter = 1e6,display=False)
+    #prob = GA_thr.deception_test(iter = 3,display=True)
+    prob = GA_thr.deception_test(iter = 1e4,display=False)
     print("3 deception prob:{:.8f}".format(prob))
 
 
     GA_four = GA(4)
-    prob = GA_four.deception_test(iter = 1e6,display=False)
+    prob = GA_four.deception_test(iter = 1e4,display=False)
     print("4 deception prob:{:.8f}".format(prob))
 

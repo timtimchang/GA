@@ -4,17 +4,22 @@ from itertools import chain, combinations
 import copy
 
 class GA:
-    def __init__(self, length = 3):
+    def __init__(self, length = 3, rank = False):
         self.length = length
         self.max = 2 ** length 
         self.min = 0
 
-        # for fit
+        self.fit = []
+        self.best_fit = 0
+        self.arg_best_fit = []
+        if rank == True : self.rank_fit()
+
+    def rank_fit(self):
         self.fit = list(range( self.max))
         random.shuffle(self.fit)
         self.best_fit = max(self.fit)
         self.arg_best_fit = int( max(range(len(self.fit)), key= self.fit.__getitem__ ))
-        
+
     def f(self, x):
         if x < self.min or x > self.max :
             return nan
