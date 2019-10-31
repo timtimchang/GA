@@ -74,10 +74,12 @@ class GA:
     def deception(self, display = False):
         #print("  abf",self.arg_best_fit)
         best_x = self.d2b( self.arg_best_fit ) 
+        best_x = [ 1 - i for i in best_x ] # here best x is the complement of best x 
 
         s = list(range(self.length))
         idx = self.powerset(s)[1:-1:] # except the [] and [all] 
-        
+        #print "idx", idx
+
         for i in range(len(idx)):
             x_pow = []
             cx_pow = []
@@ -93,7 +95,11 @@ class GA:
             cx_pow_ = self.all_set(cx_pow,sym = '#')
             cx_pow_.remove(x_pow)
             cx_list = [ self.all_set(x) for x in cx_pow_ ]                
-            
+      
+            #print "x_pow", x_pow
+            #print "cx_pow", cx_pow_
+            #print ""
+
             x_sum = 0
             cx_sum = [0] * len(cx_list)
             for j in range(len(x_list)):
@@ -102,10 +108,9 @@ class GA:
                 for k in range(len(cx_list)):
                     cx_score = self.f( self.b2d( cx_list[k][j]  ))
                     cx_sum[k] += cx_score
-            #print("cx_sum",cx_sum)
             cx_sum_max = max(cx_sum)
 
-            if cx_sum_max < x_sum : 
+            if cx_sum_max > x_sum : 
                 return False
             else:
                 if display :
@@ -146,16 +151,14 @@ class GA:
         return set
 
     def deception_test(self, iter = 10e6, display = True): 
-        count = 0
+        count = 0.0
         
         for i in range(0,int(iter)):
             if display : self.printf()
-            if self.deception(display) == True : count += 1
+            if self.deception(display = display) == True : count += 1.0
             self.refit()
+            if i % 1e5 == 0 and i != 0: print "complete: {} and the prob is {:.5f}".format(i , count / i)
 
-            if i % 1e5 == 0 and i != 0: print "complete: {} and the prob is {:.4f}".format(i , count / i)
-            
-                
         return count / iter
     
     def refit(self):
@@ -165,13 +168,15 @@ class GA:
 
 
 if __name__ == "__main__" :
+    print "Run deception..."
+
+    print "3 genes:"
     GA_thr = GA(3)
-    #prob = GA_thr.deception_test(iter = 3,display=True)
-    prob = GA_thr.deception_test(iter = 1e4,display=False)
+    prob = GA_thr.deception_test(iter = 1e6,display=False)
     print("3 deception prob:{:.8f}".format(prob))
 
-
+    print "4 genes:"
     GA_four = GA(4)
-    prob = GA_four.deception_test(iter = 1e4,display=False)
+    prob = GA_four.deception_test(iter = 1e6, display=False)
     print("4 deception prob:{:.8f}".format(prob))
 

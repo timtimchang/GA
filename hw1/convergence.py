@@ -2,6 +2,7 @@ from GA import GA
 import random
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 
 class T_model(GA):
     def __init__(self, ell = 30):
@@ -13,7 +14,10 @@ class T_model(GA):
         # for the population and chromosome
         self.population = int( 4 * ell * math.log(ell) )
         self.chromosome = []
-        
+        self.re_new()
+
+    def re_new(self):
+        self.chromosome = []
         for i in range( self.population ):
             chrom = self.d2b( random.randint(0, self.max) )
             self.chromosome.append(chrom)
@@ -32,7 +36,7 @@ class T_model(GA):
         sel_idx =  [ i for i in range(len(chromosome))] 
         random.shuffle(sel_idx )
         
-        for i in range(0,len(chromosome),2):
+        for i in range(0,len(chromosome) - 1,2):
             #print(i, self.population)
             chrom1 = chromosome[sel_idx[i]]
             chrom2 = chromosome[sel_idx[i + 1]]
@@ -54,7 +58,7 @@ class T_model(GA):
         sel_idx =  [ i for i in range(len(chromosome))] 
         random.shuffle(sel_idx )
 
-        for i in range(0,len(chromosome),2):
+        for i in range(0,len(chromosome) - 1,2):
             #print(i, self.population)
             chrom1 = chromosome[sel_idx[i]]
             chrom2 = chromosome[sel_idx[i + 1]]
@@ -99,7 +103,7 @@ class T_model(GA):
             sel_idx =  [ i for i in range(len(chromosome))] 
             random.shuffle(sel_idx )
 
-            for i in range(0,len(chromosome),s):
+            for i in range(0,len(chromosome)-1,s):
                 #print(i, self.population)
                 chrom1 = chromosome[sel_idx[i]]
                 chrom2 = chromosome[sel_idx[i + 1]]
@@ -151,36 +155,70 @@ class T_model(GA):
         print "ell ", int(self.ell) 
         print "population:", self.population
         print "cross over:", XO
-        cr_list = []
-        for i in range(iter):
-            self.tour_select()
-            if XO == 'op' :self.op_XO(display = display)
-            if XO == 'u' :self.u_XO(display = display)
-            if XO == 'pw' :self.pw_XO(display = display)
-            cr = self.convergence_rate()
-            cr_list.append(cr )
-            if display : print "  iter",i,"convergence rate {:.4f}".format(cr)
-            if cr == 1 : break
-        print "convergence iter:", len(cr_list)
-        print "  convergence rate list", [ "{:.4f}".format(i) for i in cr_list ]
+        cr_iter = []
+        test_num = 30
+        
+        for j in range(test_num):
+            self.re_new()
+            for i in range(iter):
+                self.tour_select()
+                if XO == 'op' :self.op_XO(display = display)
+                if XO == 'u' :self.u_XO(display = display)
+                if XO == 'pw' :self.pw_XO(display = display)
+                
+                cr = self.convergence_rate()
+                if display : print "  iter",i,"convergence rate {:.4f}".format(cr)
+                if cr == 1 : 
+                    cr_iter.append(i)
+                    break
+
+        #print cr_iter
+        a_cr_iter = sum(cr_iter)/ float(test_num)
+        print "avg. convergence iter: {:.4f}".format( a_cr_iter)
+
+        return a_cr_iter
 
 
 if __name__ == "__main__" :
     print("Run convergence...")
 
-    ell_set = [100] # [50, 100, 150, 200, 250, 300, 350, 400, 450, 500] 
+    ell_set = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500] 
 
+    print ""
+    op_list = []
     for i in ell_set : 
         GA_ = T_model(ell = i ) # population size =  4 * ell * log(ell)
-        GA_.run(display = False, XO = 'op')
-   
-    print "\n"
+        cr = GA_.run(display = False, XO = 'op')
+        op_list.append(cr)
+        print ""
+
+    print ""
+    u_list = []
     for i in ell_set : 
         GA_ = T_model(ell = i ) # population size =  4 * ell * log(ell)
-        GA_.run(display = False, XO = 'u')
+        cr = GA_.run(display = False, XO = 'u')
+        u_list.append(cr)
+        print ""
 
-    print "\n"
+    print ""
+    pw_list = []
     for i in ell_set : 
         GA_ = T_model(ell = i ) # population size =  4 * ell * log(ell)
-        GA_.run(display = False, XO = 'pw')
+        cr = GA_.run(display = False, XO = 'pw')
+        pw_list.append(cr)
+        print ""
 
+    # for ploting
+    plt.xlabel('ell')
+    plt.ylabel('convergence time')
+    plt.title('Experiment of three XO with a SGA on the OneMplt problem')
+    plt.xlim((ell_set[0], ell_set[-1]))
+    plt.ylim((0,500))
+
+    plt.plot(ell_set, op_list, label='one point XO')
+    plt.plot(ell_set, u_list, label='uniform XO')
+    plt.plot(ell_set, pw_list, label='population wise XO')
+
+    plt.legend()
+    plt.savefig("./result/convergence.png")
+    plt.show()
