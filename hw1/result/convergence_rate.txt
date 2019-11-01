@@ -1,0 +1,153 @@
+Run convergence...
+
+ell  50
+population: 782
+cross over: op
+avg. convergence iter: 24.2000
+
+ell  100
+population: 1842
+cross over: op
+avg. convergence iter: 37.6000
+
+ell  150
+population: 3006
+cross over: op
+avg. convergence iter: 47.0000
+
+ell  200
+population: 4238
+cross over: op
+avg. convergence iter: 55.9000
+
+ell  250
+population: 5521
+cross over: op
+avg. convergence iter: 64.5000
+
+ell  300
+population: 6844
+cross over: op
+avg. convergence iter: 71.9000
+
+ell  350
+population: 8201
+cross over: op
+avg. convergence iter: 78.6000
+
+ell  400
+population: 9586
+cross over: op
+avg. convergence iter: 85.3000
+
+ell  450
+population: 10996
+cross over: op
+avg. convergence iter: 92.7000
+
+ell  500
+population: 12429
+cross over: op
+avg. convergence iter: 98.4000
+
+
+ell  50
+population: 782
+cross over: u
+avg. convergence iter: 22.8000
+
+ell  100
+population: 1842
+cross over: u
+avg. convergence iter: 33.0000
+
+ell  150
+population: 3006
+cross over: u
+avg. convergence iter: 40.8000
+
+ell  200
+population: 4238
+cross over: u
+avg. convergence iter: 47.0000
+
+ell  250
+population: 5521
+cross over: u
+avg. convergence iter: 52.9000
+
+ell  300
+population: 6844
+cross over: u
+avg. convergence iter: 58.2000
+
+ell  350
+population: 8201
+cross over: u
+avg. convergence iter: 63.1000
+
+ell  400
+population: 9586
+cross over: u
+avg. convergence iter: 67.9000
+
+ell  450
+population: 10996
+cross over: u
+avg. convergence iter: 72.0000
+
+ell  500
+population: 12429
+cross over: u
+avg. convergence iter: 76.0000
+
+
+ell  50
+population: 782
+cross over: pw
+avg. convergence iter: 19.2000
+
+ell  100
+population: 1842
+cross over: pw
+avg. convergence iter: 27.2000
+
+ell  150
+population: 3006
+cross over: pw
+avg. convergence iter: 33.5000
+
+ell  200
+population: 4238
+cross over: pw
+avg. convergence iter: 38.9000
+
+ell  250
+population: 5521
+cross over: pw
+avg. convergence iter: 43.3000
+
+ell  300
+population: 6844
+cross over: pw
+avg. convergence iter: 47.5000
+
+ell  350
+population: 8201
+cross over: pw
+avg. convergence iter: 51.1000
+
+ell  400
+population: 9586
+cross over: pw
+avg. convergence iter: 55.0000
+
+ell  450
+population: 10996
+cross over: pw
+avg. convergence iter: 58.2000
+
+ell  500
+population: 12429
+cross over: pw
+avg. convergence iter: 61.6000

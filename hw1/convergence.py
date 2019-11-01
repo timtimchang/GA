@@ -16,6 +16,10 @@ class T_model(GA):
         self.chromosome = []
         self.re_new()
 
+        # for selection intensity
+        self.std = 0
+        self.mean = 0
+
     def re_new(self):
         self.chromosome = []
         for i in range( self.population ):
@@ -151,12 +155,31 @@ class T_model(GA):
 
         return count/float(self.population)
 
+    def selection_intensity(self, pre_std, pre_mean):
+        fit_list = []
+        for i in self.chromosome:
+            fit = self.one_max(i)
+            fit_list.append(fit)
+
+        fit_arr = np.array(fit_list)
+        
+        std = np.std(fit_arr)
+        mean = np.mean(fit_arr)
+        si = (mean - self.mean)/self.std
+        
+        self.std = std
+        self.mean = mean
+
+        return si
+
     def run(self, iter = int(1e6), display = False, XO = 'op'):
         print "ell ", int(self.ell) 
         print "population:", self.population
         print "cross over:", XO
         cr_iter = []
-        test_num = 30
+        si_list = []
+        test_num = 1 #30
+        mean = 0
         
         for j in range(test_num):
             self.re_new()
@@ -167,7 +190,11 @@ class T_model(GA):
                 if XO == 'pw' :self.pw_XO(display = display)
                 
                 cr = self.convergence_rate()
-                if display : print "  iter",i,"convergence rate {:.4f}".format(cr)
+                si = self.selection_intensity(self.std, self.mean)
+                if j == 0 : si_list.append(si)
+
+
+                if display : print "  iter",i ,"convergence rate {:.4f}".format(cr)
                 if cr == 1 : 
                     cr_iter.append(i)
                     break
@@ -176,49 +203,140 @@ class T_model(GA):
         a_cr_iter = sum(cr_iter)/ float(test_num)
         print "avg. convergence iter: {:.4f}".format( a_cr_iter)
 
-        return a_cr_iter
+        return a_cr_iter, si_list
 
+def plot_selection_intensity_single(si_list, ell_set, label = '', show = False):
+    # for ploting selection intensity
+    plt.xlabel('iter')
+    plt.ylabel('selection intensity')
+    plt.title('Selection Intensity with same XO')
+    plt.xlim((0, 50))
+    plt.ylim((0, 1))
+   
+    count = 0
+    for i in range(len(ell_set)):
+        #print op_si_list
+        iter_ = [ j for j in range(len(op_si_list[count]))] #[count]))]
+        plt.plot(iter_, op_si_list[count], label = label + str(ell_set[count]))
+        count += 1
+
+    iter_ = [ i for i in range (50)]
+    theo = [0.571] * 50
+    plt.plot(iter_, theo, label='theoratical')
+
+    plt.legend()
+    plt.savefig("./result/selection_intensity_" + label + ".png")
+    if show : plt.show()
+    plt.close()
+
+def plot_selection_intensity(op_si_list, u_si_list, pw_si_list, show = False): # 0.57
+    # for ploting selection intensity
+    plot_convergence_rate() 
+    plt.xlabel('iter')
+    plt.ylabel('selection intensity')
+    plt.title('Selection Intensity with same ell(50)')
+    plt.xlim((0, 50))
+    plt.ylim((0, 1))
+    
+
+    
+    iter_ = [i for i in range(len(op_si_list))]
+    plt.plot(iter_, op_si_list, label='one point XO')
+    iter_ = [i for i in range(len(u_si_list))]
+    plt.plot(iter_, u_si_list, label='uniform XO')
+    iter_ = [i for i in range(len(pw_si_list))]
+    plt.plot(iter_, pw_si_list, label='population wise XO')
+    iter_ = [ i for i in range (50)]
+    theo = [0.571] * 50
+    plt.plot(iter_, theo, label='theoratical')
+
+    plt.legend()
+    plt.savefig("./result/selection_intensit_50.png")
+    if show : plt.show()
+    plt.close()
+
+def plot_convergence_rate(ell_set, op_cr_list, u_cr_list, pw_cr_list, show = False):
+    # for ploting converhence rate
+    plt.xlabel('ell')
+    plt.ylabel('convergence time')
+    plt.title('Experiment of three XO with a SGA on the OneMplt problem')
+    plt.xlim((ell_set[0], ell_set[-1]))
+    plt.ylim((0,100))
+
+    plt.plot(ell_set, op_cr_list, label='one point XO')
+    plt.plot(ell_set, u_cr_list, label='uniform XO')
+    plt.plot(ell_set, pw_cr_list, label='population wise XO')
+
+    plt.legend()
+    plt.savefig("./result/convergence_rate.png")
+    if show : plt.show()
+    plt.close()
+
+def plot_convergence_rate_theoratical(ell_set, op_cr_list, u_cr_list, pw_cr_list, show = False):
+    # for ploting converhence rate
+    plt.xlabel('ell')
+    plt.ylabel('convergence time')
+    plt.title('Experiment of three XO with a SGA on the OneMplt problem')
+    plt.xlim((ell_set[0], ell_set[-1]))
+    plt.ylim((0,100))
+
+    plt.plot(ell_set, op_cr_list, label='one point XO')
+    plt.plot(ell_set, u_cr_list, label='uniform XO')
+    plt.plot(ell_set, pw_cr_list, label='population wise XO')
+    
+    I = 0.57
+    t = [ (math.pi * (m ** (0.5)) /  I) for m in ell_set ]  
+    plt.plot(ell_set, t , label = 'theoratical')
+
+
+    plt.legend()
+    plt.savefig("./result/convergence_rate_theoratical.png")
+    if show : plt.show()
+    plt.close()
 
 if __name__ == "__main__" :
     print("Run convergence...")
 
     ell_set = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500] 
-
+    
+    """
     print ""
-    op_list = []
+    op_cr_list = []
+    op_si_list = []
     for i in ell_set : 
         GA_ = T_model(ell = i ) # population size =  4 * ell * log(ell)
-        cr = GA_.run(display = False, XO = 'op')
-        op_list.append(cr)
+        cr, si = GA_.run(display = False, XO = 'op')
+        op_cr_list.append(cr)
+        op_si_list.append(si)
+        print ""
+    
+    print ""
+    u_cr_list = []
+    u_si_list = []
+    for i in ell_set : 
+        GA_ = T_model(ell = i ) # puulation size =  4 * ell * log(ell)
+        cr, si = GA_.run(display = False, XO = 'u')
+        u_cr_list.append(cr)
+        u_si_list.append(si)
         print ""
 
     print ""
-    u_list = []
+    pw_cr_list = []
+    pw_si_list = []
     for i in ell_set : 
-        GA_ = T_model(ell = i ) # population size =  4 * ell * log(ell)
-        cr = GA_.run(display = False, XO = 'u')
-        u_list.append(cr)
+        GA_ = T_model(ell = i ) # ppwulation size =  4 * ell * log(ell)
+        cr, si = GA_.run(display = False, XO = 'pw')
+        pw_cr_list.append(cr)
+        pw_si_list.append(si)
         print ""
+    """
+    op_cr_list = u_cr_list = pw_cr_list = [0]*10
+    # for ploting converhence rate
+    #plot_convergence_rate(ell_set, op_cr_list, u_cr_list, pw_cr_list)
+    plot_convergence_rate_theoratical(ell_set, op_cr_list, u_cr_list, pw_cr_list)
+   
+    # for ploting selection intensity
+    #plot_selection_intensity_single(op_si_list, ell_set, label = 'op') #, show = True)
 
-    print ""
-    pw_list = []
-    for i in ell_set : 
-        GA_ = T_model(ell = i ) # population size =  4 * ell * log(ell)
-        cr = GA_.run(display = False, XO = 'pw')
-        pw_list.append(cr)
-        print ""
-
-    # for ploting
-    plt.xlabel('ell')
-    plt.ylabel('convergence time')
-    plt.title('Experiment of three XO with a SGA on the OneMplt problem')
-    plt.xlim((ell_set[0], ell_set[-1]))
-    plt.ylim((0,500))
-
-    plt.plot(ell_set, op_list, label='one point XO')
-    plt.plot(ell_set, u_list, label='uniform XO')
-    plt.plot(ell_set, pw_list, label='population wise XO')
-
-    plt.legend()
-    plt.savefig("./result/convergence.png")
-    plt.show()
+    # for ploting selection intensity
+    #plot_selection_intensity(op_si_list[0], u_si_list[0], pw_si_list[0]) #, show = True)

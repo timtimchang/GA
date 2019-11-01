@@ -71,14 +71,17 @@ class GA:
 
         return ps 
 
-    def deception(self, display = False):
+    def deception(self, deception = 0, display = False):
+        if deception <= self.length :
+            decpetion = self.length
         #print("  abf",self.arg_best_fit)
         best_x = self.d2b( self.arg_best_fit ) 
         best_x = [ 1 - i for i in best_x ] # here best x is the complement of best x 
 
         s = list(range(self.length))
-        idx = self.powerset(s)[1:-1:] # except the [] and [all] 
-        #print "idx", idx
+        idx_set = self.powerset(s)[1:-1:] # except the [] and [all] 
+        idx = [ i for i in idx_set if len(i) < deception]
+        print "idx", idx
 
         for i in range(len(idx)):
             x_pow = []
@@ -150,12 +153,12 @@ class GA:
         #print(set)
         return set
 
-    def deception_test(self, iter = 10e6, display = True): 
+    def deception_test(self, iter = 10e6, deception = 0, display = True): 
         count = 0.0
         
         for i in range(0,int(iter)):
             if display : self.printf()
-            if self.deception(display = display) == True : count += 1.0
+            if self.deception(deception = deception, display = display) == True : count += 1.0
             self.refit()
             if i % 1e5 == 0 and i != 0: print "complete: {} and the prob is {:.5f}".format(i , count / i)
 
@@ -169,7 +172,7 @@ class GA:
 
 if __name__ == "__main__" :
     print "Run deception..."
-
+    
     print "3 genes:"
     GA_thr = GA(3)
     prob = GA_thr.deception_test(iter = 1e6,display=False)
@@ -179,4 +182,9 @@ if __name__ == "__main__" :
     GA_four = GA(4)
     prob = GA_four.deception_test(iter = 1e6, display=False)
     print("4 deception prob:{:.8f}".format(prob))
+    
+    # for 3 > 4
+    
+
+
 
